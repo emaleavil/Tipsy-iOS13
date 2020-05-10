@@ -19,8 +19,10 @@ class CalculatorViewController: UIViewController {
     var percentage = 0.1
     var splitBy = 2.0
     var inputValue = 0.0
+    var total = 0.0
 
     @IBAction func tipChanged(_ sender: UIButton) {
+        billTextField.endEditing(true)
         let id = sender.accessibilityIdentifier
         switch id {
         case "zeroBtn":
@@ -45,19 +47,29 @@ class CalculatorViewController: UIViewController {
     }
     
     @IBAction func stepperValueChanged(_ sender: UIStepper) {
+        billTextField.endEditing(true)
         splitBy = sender.value
         splitNumberLabel.text = "\(Int(splitBy))"
     }
     
     @IBAction func calculatePressed(_ sender: UIButton) {
+        billTextField.endEditing(true)
         inputValue = (billTextField.text as NSString?)?.doubleValue ?? 0.0
         print("Percentage selected: \(percentage)")
         print("Splitted by: \(splitBy)")
         print("Value: \(inputValue)")
         
-        let result = (inputValue + (inputValue * percentage)) / splitBy
-        print("Result: \(result)")
+        total = (inputValue + (inputValue * percentage)) / splitBy
+        print("Result: \(String(format:"%.2f", total))")
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.destination is ResultViewController {
+            let controller = segue.destination as? ResultViewController
+            controller?.total = total
+            controller?.numberOfPeople = splitBy
+            controller?.percentage = Int(percentage * 100)
+        }
+    }
 }
 
